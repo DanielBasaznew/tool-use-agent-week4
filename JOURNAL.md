@@ -5,3 +5,10 @@ A 200-character search snippet acts as a lightweight index—it is fast, cheap, 
 
 ### Daily Experience & Key Engineering Takeaway
 Today was a challenging build day due to unexpected API rate limits (429 errors) and model deprecation issues. Transitioning to `gemini-3.1-flash-lite`, disabling automatic function calling to observe the intermediate ReAct loop, and adding explicit execution pauses (`time.sleep`) resolved the quota bottlenecks. Migrating from manual string parsing to formal JSON schemas is a major upgrade—it creates predictable, structured tool invocations that mirror how production AI agents are built in the real world.
+
+# Day 2: Citation Engine & Structured Outputs
+
+### Technical Reflection
+Requiring an AI agent to cite its sources fundamental transforms its role from a probabilistic text generator into a grounded research tool. By enforcing a structured Pydantic schema (`ResearchReport` with `Source` items), the model is forced to map every assertion directly back to specific titles and key points retrieved during the ReAct phase. 
+
+This strict schema-bound mapping drastically reduces hallucinations—the LLM cannot fabricate claims without failing its contract to trace them back to extracted context. Structured outputs convert raw web clutter into predictable, audit-ready data suitable for downstream applications.
