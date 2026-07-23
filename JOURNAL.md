@@ -1,0 +1,7 @@
+# Day 1 Journal: Research Agent Foundation & Native Schemas
+
+### Technical Reflection: Search Snippets vs. Fetched Pages
+A 200-character search snippet acts as a lightweight index—it is fast, cheap, and allows the agent to scan multiple sources without clogging the context window. Snippets are ideal for direct factual queries (like calculating distances or checking simple dates). A 2,000-character fetched page provides deep context necessary for comprehensive analysis, code summaries, or multi-step synthesis. However, full pages consume significantly more context window capacity and add network latency. A production agent should use snippets to evaluate source relevance and reserve full-page fetching only when deep context is strictly required.
+
+### Daily Experience & Key Engineering Takeaway
+Today was a challenging build day due to unexpected API rate limits (429 errors) and model deprecation issues. Transitioning to `gemini-3.1-flash-lite`, disabling automatic function calling to observe the intermediate ReAct loop, and adding explicit execution pauses (`time.sleep`) resolved the quota bottlenecks. Migrating from manual string parsing to formal JSON schemas is a major upgrade—it creates predictable, structured tool invocations that mirror how production AI agents are built in the real world.
