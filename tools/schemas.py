@@ -1,6 +1,6 @@
 """
 JSON Schemas for Native Function Calling (Week 4, Day 1)
-Defines tool contracts for web_search and fetch_page.
+Defines tool contracts for web_search, fetch_page, and execute_python.
 """
 
 TOOL_SCHEMAS = [
@@ -40,6 +40,28 @@ TOOL_SCHEMAS = [
                 }
             },
             "required": ["url"]
+        }
+    },  # <--- THIS IS THE COMMA THAT WAS MISSING!
+    {
+        "name": "execute_python",
+        "description": (
+            "Executes standalone Python code in an isolated subprocess. "
+            "Use this tool for mathematical computations, data analysis, list sorting, algorithmic logic, "
+            "or generating charts/plots. "
+            "CRITICAL: Your code must be complete, include all necessary imports, and explicitly use "
+            "print() to display results or outputs. "
+            "For charts, do NOT use plt.show(); instead, save the chart to disk using plt.savefig('chart.png') "
+            "and print a confirmation message."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "description": "Valid Python code to be executed."
+                }
+            },
+            "required": ["code"]
         }
     }
 ]

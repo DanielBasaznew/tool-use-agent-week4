@@ -9,7 +9,7 @@ from google import genai
 from google.genai import types
 from rich import print
 
-from tools import web_search, fetch_page, TOOL_REGISTRY
+from tools import web_search, fetch_page, execute_python, TOOL_REGISTRY
 from report_generator import generate_research_report
 from display import display_report
 
@@ -35,7 +35,7 @@ def run_agent(user_query: str, max_iterations: int = 5):
 
     config = types.GenerateContentConfig(
         system_instruction=system_instruction,
-        tools=[web_search, fetch_page],
+        tools=[web_search, fetch_page, execute_python],
         temperature=0.2,
         automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True)
     )
@@ -103,5 +103,5 @@ def run_agent(user_query: str, max_iterations: int = 5):
 
 if __name__ == "__main__":
     # Test prompt 1 from mentor's plan
-    test_prompt = "Explain the current state of fusion energy research."
+    test_prompt = "Plot a bar chart of the first 10 Fibonacci numbers"
     run_agent(test_prompt)
