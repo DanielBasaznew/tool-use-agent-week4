@@ -43,3 +43,21 @@ Combining multiple tools (web search, web fetching, Python execution, and PDF re
 1. **Context Window Protection:** Multi-step agent loops accumulate large amounts of raw text from webpage fetches and PDF overviews. Implementing `trim_messages_if_needed` protects the system from context overflow errors by popping the oldest non-system conversation turns when character counts exceed threshold limits.
 2. **Tool Selection Behavior & Path of Least Resistance:** When presented with 5 tools, the agent frequently optimizes for the simplest path to fulfill prompt requirements. For instance, rather than downloading and parsing online PDFs or writing complex web-scraping scripts, it leverages web search snippets and injects gathered facts directly into executable Python scripts.
 3. **Grounding vs. Helpfulness Conflict:** Even with strict system prompts forbidding the use of training memory, the agent will sometimes break the rules if the fetched data is truncated (e.g., Wikipedia tables being cut off). The model prioritizes generating a helpful output (like rendering the requested chart) over strict adherence to data provenance rules, highlighting the need for more robust data extraction pipelines in future iterations.
+
+## 📝 Weekly Summary (Week 4)
+
+### 1. Which tool was the hardest to build and why?
+
+The **PDF reader** was the most challenging tool to build. It required handling document metadata, extracting text across multiple pages, managing page navigation, and designing a workflow that provides both a document overview and on-demand page retrieval.
+
+### 2. What is the most impressive thing your agent can now do?
+
+The agent can perform **PDF Question & Answering**. It reads a local PDF, understands its content, answers questions about the document, and automatically retrieves specific pages when additional context is needed.
+
+### 3. How does the agent handle scanned PDFs?
+
+Currently, scanned PDFs without a text layer cannot be parsed because there is no embedded text to extract. A future improvement is to integrate **OCR (Optical Character Recognition)** using **Tesseract** so the agent can process image-based PDFs.
+
+### 4. What are you most excited about in Week 5?
+
+I'm excited to implement **Retrieval-Augmented Generation (RAG)**. Giving the agent long-term memory will allow it to search and retrieve relevant information from large document collections instead of relying only on the current conversation context.s
