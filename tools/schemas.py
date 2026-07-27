@@ -1,67 +1,80 @@
 """
-JSON Schemas for Native Function Calling (Week 4, Day 1)
-Defines tool contracts for web_search, fetch_page, and execute_python.
+JSON Schemas for Native Function Calling (Week 4)
+Defines tool contracts for search, code execution, and PDF reading.
 """
 
 TOOL_SCHEMAS = [
     {
         "name": "web_search",
-        "description": (
-            "Searches DuckDuckGo for live web information. Returns numbered search results "
-            "with titles, URLs, and short 200-character snippets. "
-            "Use specific queries rather than broad single words. "
-            "Good query example: 'GPT-4 vs Claude 3 differences 2024'. "
-            "Bad query example: 'GPT'."
-        ),
+        "description": "Searches DuckDuckGo for live web information. Returns numbered search results with titles, URLs, and short 200-character snippets.",
         "parameters": {
             "type": "object",
             "properties": {
-                "query": {
-                    "type": "string",
-                    "description": "Specific search query terms."
-                }
+                "query": {"type": "string", "description": "Specific search query terms."}
             },
             "required": ["query"]
         }
     },
     {
         "name": "fetch_page",
-        "description": (
-            "Fetches and extracts clean, full body text from a specific webpage URL. "
-            "Use this tool after web_search when you need deeper details, full article text, "
-            "or precise facts beyond what a short 200-character snippet provides."
-        ),
+        "description": "Fetches and extracts clean, full body text from a specific webpage URL.",
         "parameters": {
             "type": "object",
             "properties": {
-                "url": {
-                    "type": "string",
-                    "description": "The exact target webpage URL to fetch (must start with http:// or https://)."
-                }
+                "url": {"type": "string", "description": "The exact target webpage URL to fetch."}
             },
             "required": ["url"]
         }
-    },  # <--- THIS IS THE COMMA THAT WAS MISSING!
+    },
     {
         "name": "execute_python",
+        "description": "Executes standalone Python code in an isolated subprocess. Use explicitly for math, logic, sorting, or charts. Must use print() or plt.savefig().",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "code": {"type": "string", "description": "Valid Python code to be executed."}
+            },
+            "required": ["code"]
+        }
+    },
+    {
+        "name": "read_pdf",
         "description": (
-            "Executes standalone Python code in an isolated subprocess. "
-            "Use this tool for mathematical computations, data analysis, list sorting, algorithmic logic, "
-            "or generating charts/plots. "
-            "CRITICAL: Your code must be complete, include all necessary imports, and explicitly use "
-            "print() to display results or outputs. "
-            "For charts, do NOT use plt.show(); instead, save the chart to disk using plt.savefig('chart.png') "
-            "and print a confirmation message."
+            "Extracts document metadata and the first 3000 characters of text from a local PDF file. "
+            "Use this tool FIRST to get an overview of what a document contains, its length, and its general topics. "
+            "If the output says it was truncated, use read_pdf_page to fetch specific pages."
         ),
         "parameters": {
             "type": "object",
             "properties": {
-                "code": {
+                "file_path": {
                     "type": "string",
-                    "description": "Valid Python code to be executed."
+                    "description": "The local file path to the PDF document."
                 }
             },
-            "required": ["code"]
+            "required": ["file_path"]
+        }
+    },
+    {
+        "name": "read_pdf_page",
+        "description": (
+            "Extracts the complete text from a single, specific page of a local PDF file. "
+            "Use this tool ONLY AFTER using read_pdf, when you need the full detail of a specific page "
+            "that was mentioned in the overview or truncated."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "file_path": {
+                    "type": "string",
+                    "description": "The local file path to the PDF document."
+                },
+                "page_number": {
+                    "type": "integer",
+                    "description": "The 1-indexed page number to extract (e.g., 1 for the first page)."
+                }
+            },
+            "required": ["file_path", "page_number"]
         }
     }
 ]
