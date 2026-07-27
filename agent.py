@@ -9,7 +9,7 @@ from google import genai
 from google.genai import types
 from rich import print
 
-from tools import web_search, fetch_page, execute_python, TOOL_REGISTRY
+from tools import web_search, fetch_page, execute_python, read_pdf, read_pdf_page, TOOL_REGISTRY
 from report_generator import generate_research_report
 from display import display_report
 
@@ -25,17 +25,19 @@ def run_agent(user_query: str, max_iterations: int = 5):
     """Executes a ReAct research loop, then passes gathered facts into the Citation Engine."""
     print(f"\n[bold green]User Query:[/bold green] {user_query}\n")
 
+    
     system_instruction = (
-        "You are an expert research assistant capable of searching the web and reading web pages. "
+        "You are an expert research assistant capable of searching the web, reading web pages, and reading PDF documents. "
         "When asked a research question, follow this strategy:\n"
         "1. Search the web using web_search with specific, targeted terms.\n"
         "2. Review search results and call fetch_page on 1-2 promising URLs to get deep details.\n"
+        "3. If asked about a PDF, use read_pdf first, then read_pdf_page for specific details.\n"
         "Always search and fetch facts before concluding."
     )
 
     config = types.GenerateContentConfig(
         system_instruction=system_instruction,
-        tools=[web_search, fetch_page, execute_python],
+        tools=[web_search, fetch_page, execute_python, read_pdf, read_pdf_page],
         temperature=0.2,
         automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True)
     )
@@ -102,6 +104,10 @@ def run_agent(user_query: str, max_iterations: int = 5):
 
 
 if __name__ == "__main__":
-    # Test prompt 1 from mentor's plan
-    test_prompt = "Plot a bar chart of the first 10 Fibonacci numbers"
-    run_agent(test_prompt)
+    print("=== Welcome to the ReAct Research Agent ===")
+    user_input = input("Enter your research request: ").strip()
+    
+    if user_input:
+        run_agent(user_input)
+    else:
+        print("No input provided. Exiting.")
