@@ -21,20 +21,43 @@ if not api_key:
 
 client = genai.Client(api_key=api_key)
 
+def trim_messages_if_needed(contents: list, max_chars: int = 12000) -> list:
+    """
+    Trims the oldest messages from the conversation history if it exceeds the character limit.
+    Pops items from the front (index 0) in pairs to maintain conversational flow.
+    """
+    while True:
+        # Calculate total characters in the current conversation history
+        total_chars = sum(len(str(msg)) for msg in contents)
+        
+        # If we are safely under the limit, or we only have 1-2 messages left, stop trimming
+        if total_chars <= max_chars or len(contents) <= 2:
+            break
+            
+        # If we are over the limit, remove the oldest memory turn (2 items)
+        print(f"[bold red][SYSTEM][/bold red] Context limit approaching ({total_chars}/{max_chars} chars). Trimming oldest memory...")
+        contents.pop(0)  
+        if len(contents) > 0:
+            contents.pop(0)
+            
+    return contents
+
 def run_agent(user_query: str, max_iterations: int = 5):
     """Executes a ReAct research loop, then passes gathered facts into the Citation Engine."""
     print(f"\n[bold green]User Query:[/bold green] {user_query}\n")
 
     
-    system_instruction = (
-        "You are an expert research assistant capable of searching the web, reading web pages, and reading PDF documents. "
-        "When asked a research question, follow this strategy:\n"
-        "1. Search the web using web_search with specific, targeted terms.\n"
-        "2. Review search results and call fetch_page on 1-2 promising URLs to get deep details.\n"
-        "3. If asked about a PDF, use read_pdf first, then read_pdf_page for specific details.\n"
-        "Always search and fetch facts before concluding."
-    )
+   
 
+    system_instruction = (
+        "You are an expert research assistant capable of searching the web, reading web pages, reading PDFs, and running Python code.\n\n"
+        "Strategy:\n"
+        "1. Search the web using web_search with specific, targeted terms.\n"
+        "2. Retrieve details from specific pages using fetch_page or local files with read_pdf.\n"
+        "3. Use execute_python for calculations, data analysis, or generating charts.\n\n"
+        "Grounding Rule: Base your answers and code on facts retrieved from your tools whenever available. "
+        "If fetched information is missing or incomplete, search again with a refined query before concluding."
+    )
     config = types.GenerateContentConfig(
         system_instruction=system_instruction,
         tools=[web_search, fetch_page, execute_python, read_pdf, read_pdf_page],

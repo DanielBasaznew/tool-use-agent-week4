@@ -34,3 +34,12 @@ To optimize context window usage, we implemented a two-tier extraction pattern:
 2. `read_pdf_page`: Fetches full text for specific 1-indexed pages on demand.
 
 When tested against a scanned image PDF (`photo-print.pdf`), the tool failed safely by returning a warning that no extractable text characters were found, preventing context pollution or model hallucination.
+
+# Day 5: Unified Multi-Tool Research Agent & Context Window Protection
+
+### Technical Reflection
+Combining multiple tools (web search, web fetching, Python execution, and PDF reading) into a single ReAct loop reveals key insights into model orchestration and context window limits:
+
+1. **Context Window Protection:** Multi-step agent loops accumulate large amounts of raw text from webpage fetches and PDF overviews. Implementing `trim_messages_if_needed` protects the system from context overflow errors by popping the oldest non-system conversation turns when character counts exceed threshold limits.
+2. **Tool Selection Behavior & Path of Least Resistance:** When presented with 5 tools, the agent frequently optimizes for the simplest path to fulfill prompt requirements. For instance, rather than downloading and parsing online PDFs or writing complex web-scraping scripts, it leverages web search snippets and injects gathered facts directly into executable Python scripts.
+3. **Grounding vs. Helpfulness Conflict:** Even with strict system prompts forbidding the use of training memory, the agent will sometimes break the rules if the fetched data is truncated (e.g., Wikipedia tables being cut off). The model prioritizes generating a helpful output (like rendering the requested chart) over strict adherence to data provenance rules, highlighting the need for more robust data extraction pipelines in future iterations.
